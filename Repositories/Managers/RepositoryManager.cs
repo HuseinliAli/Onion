@@ -2,11 +2,6 @@
 using Contracts.Repositories;
 using Repositories.Contexts;
 using Repositories.Repos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Repositories.Managers;
 public sealed class RepositoryManager : IRepositoryManager
@@ -17,7 +12,7 @@ public sealed class RepositoryManager : IRepositoryManager
 
     public RepositoryManager(RepositoryContext repositoryContext)
     {
-        _repositoryContext= repositoryContext;
+        _repositoryContext = repositoryContext;
         _companyRepository = new Lazy<ICompanyRepository>(() => new CompanyRepository(repositoryContext));
         _employeeRepository = new Lazy<IEmployeeRepository>(() => new EmployeeRepository(repositoryContext));
     }
@@ -27,4 +22,3 @@ public sealed class RepositoryManager : IRepositoryManager
 
     public void Save() => _repositoryContext.SaveChanges();
 }
-

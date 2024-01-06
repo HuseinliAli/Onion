@@ -13,7 +13,6 @@ namespace LoggerService.NLog
         private static ILogger _logger = LogManager.GetCurrentClassLogger(); 
         public NLogLoggerManager()
         {
-            
         }
         public void LogDebug(string message) 
             => _logger.Debug(message);
