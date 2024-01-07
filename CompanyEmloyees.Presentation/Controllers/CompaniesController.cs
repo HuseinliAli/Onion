@@ -9,14 +9,22 @@ using System.Threading.Tasks;
 
 namespace CompanyEmloyees.Presentation.Controllers
 {
+    [Route("api/[controller]")]
     public class CompaniesController(IServiceManager serviceManager) : BaseApiController
     {
         [HttpGet]
         public IActionResult GetCompanies()
         {
-            throw new Exception("Exception");
+           // throw new Exception("Exception");
             var companies = serviceManager.CompanyService.GetAllCompanies(false);
             return Ok(companies);
+        }
+
+        [HttpGet("{id:guid}")]
+        public IActionResult GetCompany(Guid id)
+        {
+            var company = serviceManager.CompanyService.GetCompany(id,changeTracker: false);
+            return Ok(company);
         }
     }
 }

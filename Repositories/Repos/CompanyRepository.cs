@@ -11,5 +11,8 @@ public class CompanyRepository : RepositoryBase<Company>, ICompanyRepository
     }
 
     public IEnumerable<Company> GetAllCompanies(bool changeTracker)
-    => FindAll(changeTracker).OrderBy(c=>c.Name).ToList();
+        => FindAll(changeTracker).OrderBy(c=>c.Name).ToList();
+
+    public Company GetCompany(Guid id, bool changeTracker)
+        => FindCondition(x=>x.Id.Equals(id),changeTracker).SingleOrDefault();
 }

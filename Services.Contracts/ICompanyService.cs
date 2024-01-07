@@ -10,4 +10,5 @@ namespace Services.Contracts;
 public interface ICompanyService
 {
     IEnumerable<CompanyDto> GetAllCompanies(bool changeTracker);
+    CompanyDto GetCompany(Guid companyId, bool changeTracker);
 }

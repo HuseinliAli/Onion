@@ -10,6 +10,7 @@ namespace API
         {
             CreateMap<Company, CompanyDto>()
                 .ForCtorParam("FullAddress",opt=>opt.MapFrom(i=>string.Join(' ',i.Address,i.Country)));
+            CreateMap<Employee, EmployeeDto>();
         }
     }
 }
