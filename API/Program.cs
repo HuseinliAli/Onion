@@ -1,10 +1,11 @@
 using API.Extensions;
 using Contracts.Logging;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc;
 using NLog;
 
 var builder = WebApplication.CreateBuilder(args);
-LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(),"/nlog.config"));
+LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
 // Add services to the container.
 builder.Services.ConfigureCors();
 builder.Services.ConfigureISSIntegration();
@@ -13,7 +14,10 @@ builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureServiceManager();
 builder.Services.ConfigureSqlContext(builder.Configuration);
 builder.Services.AddAutoMapper(typeof(Program));
-builder.Services.AddControllers(config =>{
+builder.Services.Configure<ApiBehaviorOptions>(opt =>
+    { opt.SuppressModelStateInvalidFilter=true; });
+builder.Services.AddControllers(config =>
+{
     config.RespectBrowserAcceptHeader=true;
     config.ReturnHttpNotAcceptable=true;
 }).AddXmlDataContractSerializerFormatters()
