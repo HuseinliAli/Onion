@@ -1,5 +1,6 @@
 ﻿using Contracts.Repositories;
 using Domain.Models;
+using Microsoft.EntityFrameworkCore;
 using Repositories.Contexts;
 
 namespace Repositories.Repos;
@@ -12,6 +13,9 @@ public class CompanyRepository : RepositoryBase<Company>, ICompanyRepository
 
     public void CreateCompany(Company company)
         => Create(company);
+
+    public void DeleteCompany(Company company)
+        => Delete(company);
 
     public IEnumerable<Company> GetAllCompanies(bool changeTracker)
         => FindAll(changeTracker).OrderBy(c=>c.Name).ToList();

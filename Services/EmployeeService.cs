@@ -22,6 +22,18 @@ internal sealed class EmployeeService(IRepositoryManager repositoryManager, ILog
         return employeeToReturn;
     }
 
+    public void DeleteEmployeeForCompany(Guid companyId, Guid id, bool changeTracker)
+    {
+        var company = repositoryManager.Company.GetCompany(companyId, changeTracker);
+        if (company is null)
+            throw new CompanyNotFoundException(companyId);
+        var employeeForCompany = repositoryManager.Employee.GetEmployee(companyId, id, changeTracker);
+        if (employeeForCompany is null)
+            throw new EmployeeNotFoundException(id);
+        repositoryManager.Employee.DeleteEmployee(employeeForCompany);
+        repositoryManager.Save();
+    }
+
     public EmployeeDto GetEmployee(Guid companyId, Guid id, bool changeTracker)
     {
         var company = repositoryManager.Company.GetCompany(companyId, changeTracker);

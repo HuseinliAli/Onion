@@ -8,5 +8,6 @@ public interface ICompanyRepository
     IEnumerable<Company> GetAllCompanies(bool changeTracker);
     Company GetCompany(Guid id, bool changeTracker);
     void CreateCompany(Company company);
-    IEnumerable<Company> GetByIds(IEnumerable<Guid> ids,bool changeTracker);    
+    IEnumerable<Company> GetByIds(IEnumerable<Guid> ids,bool changeTracker);
+    void DeleteCompany(Company company);
 }

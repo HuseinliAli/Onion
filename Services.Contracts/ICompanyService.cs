@@ -15,4 +15,4 @@ public interface ICompanyService
     IEnumerable<CompanyDto> GetAllByIds(IEnumerable<Guid> ids, bool changeTracker);
     (IEnumerable<CompanyDto> companies, string ids) CreateCompanyCollection
         (IEnumerable<CompanyForCreationDto> companyCollection);
-}
+    void DeleteCompany(Guid id, bool changeTracker);

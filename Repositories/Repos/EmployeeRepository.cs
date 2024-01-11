@@ -16,6 +16,9 @@ public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
         Create(employee);
     }
 
+    public void DeleteEmployee(Employee employee)
+        =>Delete(employee);
+
     public Employee GetEmployee(Guid companyId, Guid id, bool changeTracker)
         => FindCondition(x=>x.CompanyId.Equals(companyId ) && x.Id.Equals(id),changeTracker)
            .SingleOrDefault();

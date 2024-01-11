@@ -39,6 +39,15 @@ internal sealed class CompanyService(IRepositoryManager repositoryManager, ILogg
         return (companyCollectionToReturn, ids);            
     }
 
+    public void DeleteCompany(Guid id, bool changeTracker)
+    {
+        var company = repositoryManager.Company.GetCompany(id,changeTracker);
+        if (company is null)
+            throw new CompanyNotFoundException(id);
+        repositoryManager.Company.DeleteCompany(company);
+        repositoryManager.Save();
+    }
+
     public IEnumerable<CompanyDto> GetAllByIds(IEnumerable<Guid> ids, bool changeTracker)
     {
         if (ids is null)
