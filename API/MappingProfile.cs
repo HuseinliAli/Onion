@@ -12,7 +12,9 @@ namespace API
                 .ForMember(c=>c.FullAddress,opt=>opt.MapFrom(i=>string.Join(' ',i.Address,i.Country)));
             CreateMap<Employee, EmployeeDto>();
             CreateMap<CompanyForCreationDto, Company>();
-            CreateMap<EmployeeForCreationDto , Employee>(); 
+            CreateMap<EmployeeForCreationDto , Employee>();
+            CreateMap<EmployeeForUpdateDto, Employee>();
+            CreateMap<CompanyForUpdateDto , Company>();
         }
     }
 }
