@@ -46,6 +46,18 @@ internal sealed class EmployeeService(IRepositoryManager repositoryManager, ILog
         return employeeDto;
     }
 
+    public (EmployeeForUpdateDto employeeToPatch, Employee employeeEntity) GetEmployeeForPatch(Guid companyId, Guid id, bool compChangeTracker, bool empChangeTracker)
+    {
+        var company = repositoryManager.Company.GetCompany(companyId, compChangeTracker);
+        if (company is null)
+            throw new CompanyNotFoundException(companyId);
+        var employeeEntity = repositoryManager.Employee.GetEmployee(companyId, id, empChangeTracker);
+        if (employeeEntity is null)
+            throw new EmployeeNotFoundException(companyId);
+        var employeeToPatch = mapper.Map<EmployeeForUpdateDto>(employeeEntity);
+        return (employeeToPatch, employeeEntity);
+    }
+
     public IEnumerable<EmployeeDto> GetEmployees(Guid companyId, bool changeTracker)
     {
         var company = repositoryManager.Company.GetCompany(companyId,changeTracker);
@@ -54,6 +66,12 @@ internal sealed class EmployeeService(IRepositoryManager repositoryManager, ILog
         var employeesFromDb = repositoryManager.Employee.GetEmployees(companyId, changeTracker);
         var employeesDto = mapper.Map<IEnumerable<EmployeeDto>>(employeesFromDb);
         return employeesDto;
+    }
+
+    public void SaveChangesForPatch(EmployeeForUpdateDto employeeToPatch, Employee employeeEntity)
+    {
+        mapper.Map(employeeToPatch, employeeEntity);
+        repositoryManager.Save();
     }
 
     public void UpdateEmployeeForCompany(Guid companyId, Guid id, EmployeeForUpdateDto dto, bool compChangeTracker, bool empChangeTracker)

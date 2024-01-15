@@ -1,4 +1,5 @@
-﻿using Shared.DTOs;
+﻿using Domain.Models;
+using Shared.DTOs;
 
 namespace Services.Contracts;
 
@@ -10,4 +11,7 @@ public interface IEmployeeService
     void DeleteEmployeeForCompany(Guid companyId, Guid id, bool changeTracker);
     void UpdateEmployeeForCompany(Guid companyId, Guid id,
         EmployeeForUpdateDto dto, bool compChangeTracker, bool empChangeTracker);
+    (EmployeeForUpdateDto employeeToPatch, Employee employeeEntity) GetEmployeeForPatch(
+        Guid companyId, Guid id, bool compChangeTracker, bool empChangeTracker);
+    void SaveChangesForPatch(EmployeeForUpdateDto employeeToPatch, Employee employeeEntity);
 }
