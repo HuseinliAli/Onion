@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 namespace Services.Contracts;
 public interface ICompanyService
 {
-    IEnumerable<CompanyDto> GetAllCompanies(bool changeTracker);
-    CompanyDto GetCompany(Guid companyId, bool changeTracker);
-    CompanyDto Create(CompanyForCreationDto company);
-    IEnumerable<CompanyDto> GetAllByIds(IEnumerable<Guid> ids, bool changeTracker);
-    (IEnumerable<CompanyDto> companies, string ids) CreateCompanyCollection
+    Task<IEnumerable<CompanyDto>> GetAllCompaniesAsync(bool changeTracker);
+    Task<CompanyDto> GetCompanyAsync(Guid companyId, bool changeTracker);
+    Task<CompanyDto> CreateAsync(CompanyForCreationDto company);
+    Task<IEnumerable<CompanyDto>> GetAllByIdsAsync(IEnumerable<Guid> ids, bool changeTracker);
+    Task<(IEnumerable<CompanyDto> companies, string ids)> CreateCompanyCollectionAsync
         (IEnumerable<CompanyForCreationDto> companyCollection);
-    void DeleteCompany(Guid id, bool changeTracker);
-    void UpdateCompany(Guid companyId,CompanyForUpdateDto companyForUpdate, bool changeTracker);
+    Task DeleteCompanyAsync(Guid id, bool changeTracker);
+    Task UpdateCompanyAsync(Guid companyId,CompanyForUpdateDto companyForUpdate, bool changeTracker);
 }

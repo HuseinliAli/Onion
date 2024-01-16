@@ -11,6 +11,6 @@ namespace Contracts.Managers
     {
         ICompanyRepository Company { get; }
         IEmployeeRepository Employee { get; }
-        void Save();
+        Task SaveAsync();
     }
 }

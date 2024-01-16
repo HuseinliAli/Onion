@@ -17,12 +17,12 @@ public class CompanyRepository : RepositoryBase<Company>, ICompanyRepository
     public void DeleteCompany(Company company)
         => Delete(company);
 
-    public IEnumerable<Company> GetAllCompanies(bool changeTracker)
-        => FindAll(changeTracker).OrderBy(c=>c.Name).ToList();
+    public async Task<IEnumerable<Company>> GetAllCompaniesAsync(bool changeTracker)
+        =>await FindAll(changeTracker).OrderBy(c=>c.Name).ToListAsync();
 
-    public IEnumerable<Company> GetByIds(IEnumerable<Guid> ids, bool changeTracker)
-        => FindCondition(x => ids.Contains(x.Id), changeTracker).ToList();
+    public async Task<IEnumerable<Company>> GetByIdsAsync(IEnumerable<Guid> ids, bool changeTracker)
+        =>await FindCondition(x => ids.Contains(x.Id), changeTracker).ToListAsync();
 
-    public Company GetCompany(Guid id, bool changeTracker)
-        => FindCondition(x=>x.Id.Equals(id),changeTracker).SingleOrDefault();
+    public async Task<Company> GetCompanyAsync(Guid id, bool changeTracker)
+        =>await FindCondition(x=>x.Id.Equals(id),changeTracker).SingleOrDefaultAsync();
 }

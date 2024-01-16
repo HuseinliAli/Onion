@@ -5,9 +5,9 @@ namespace Contracts.Repositories;
 
 public interface ICompanyRepository
 {
-    IEnumerable<Company> GetAllCompanies(bool changeTracker);
-    Company GetCompany(Guid id, bool changeTracker);
+    Task<IEnumerable<Company>> GetAllCompaniesAsync(bool changeTracker);
+    Task<Company> GetCompanyAsync(Guid id, bool changeTracker);
     void CreateCompany(Company company);
-    IEnumerable<Company> GetByIds(IEnumerable<Guid> ids,bool changeTracker);
+    Task<IEnumerable<Company>> GetByIdsAsync(IEnumerable<Guid> ids,bool changeTracker);
     void DeleteCompany(Company company);
 }
