@@ -20,3 +20,10 @@ public sealed class CompanyCollectionBadRequest : BadRequestException
         
     }
 }
+
+public sealed class MaxAgeRangeBadRequestException : BadRequestException
+{
+    public MaxAgeRangeBadRequestException() : base("Max age cant be less than min age")
+    {
+    }
+}

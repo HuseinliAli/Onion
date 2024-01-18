@@ -56,6 +56,9 @@ internal sealed class EmployeeService(IRepositoryManager repositoryManager, ILog
 
     public async Task<(IEnumerable<EmployeeDto> employees, MetaData metaData)> GetEmployeesAsync(Guid companyId,EmployeeParameters employeeParameters, bool changeTracker)
     {
+        if (!employeeParameters.ValidAgeRange)
+            throw new MaxAgeRangeBadRequestException();
+
         await CheckIfCompanyExistsAsync(companyId, changeTracker);
 
         var employeesWithMetaData =await repositoryManager.Employee
@@ -85,7 +88,7 @@ internal sealed class EmployeeService(IRepositoryManager repositoryManager, ILog
 
     private async Task CheckIfCompanyExistsAsync(Guid id, bool changeTracker)
     {
-        var company = repositoryManager.Company.GetCompanyAsync(id, changeTracker);
+        var company =await repositoryManager.Company.GetCompanyAsync(id, changeTracker);
         if (company is null)
             throw new CompanyNotFoundException(id);
     }
