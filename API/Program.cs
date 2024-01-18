@@ -1,4 +1,5 @@
 using API.Extensions;
+using CompanyEmloyees.Presentation.ActionFilters;
 using Contracts.Logging;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
 
 // Add services to the container.
+builder.Services.AddScoped<ValidationFilterAttribute>();
 builder.Services.ConfigureCors();
 builder.Services.ConfigureISSIntegration();
 builder.Services.ConfigureLoggerService();

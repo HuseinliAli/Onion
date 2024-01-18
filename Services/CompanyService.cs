@@ -7,6 +7,7 @@ using Services.Contracts;
 using Shared.DTOs;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,9 +42,7 @@ internal sealed class CompanyService(IRepositoryManager repositoryManager, ILogg
 
     public async Task DeleteCompanyAsync(Guid id, bool changeTracker)
     {
-        var company =await repositoryManager.Company.GetCompanyAsync(id,changeTracker);
-        if (company is null)
-            throw new CompanyNotFoundException(id);
+        var company =await GetCompanyAndCheckIfItExistsAsync(id, changeTracker);
         repositoryManager.Company.DeleteCompany(company);
         await repositoryManager.SaveAsync();
     }
@@ -68,19 +67,23 @@ internal sealed class CompanyService(IRepositoryManager repositoryManager, ILogg
 
     public async Task<CompanyDto> GetCompanyAsync(Guid companyId, bool changeTracker)
     {
-        var company =await repositoryManager.Company.GetCompanyAsync(companyId, changeTracker);
-        if (company is null)
-            throw new CompanyNotFoundException(companyId);
+        var company =await GetCompanyAndCheckIfItExistsAsync(companyId, changeTracker);
         var companyDto = mapper.Map<CompanyDto>(company);
         return companyDto;
     }
 
     public async Task UpdateCompanyAsync(Guid companyId, CompanyForUpdateDto companyForUpdate, bool changeTracker)
     {
-        var companyEntity =await repositoryManager.Company.GetCompanyAsync(companyId, changeTracker);
-        if (companyEntity is null)
-            throw new CompanyNotFoundException(companyId);
-        mapper.Map(companyForUpdate, companyEntity);
+        var company =await GetCompanyAndCheckIfItExistsAsync(companyId, changeTracker);
+        mapper.Map(companyForUpdate, company);
         await repositoryManager.SaveAsync();
+    }
+
+    private async Task<Company> GetCompanyAndCheckIfItExistsAsync(Guid id, bool changeTracker)
+    {
+        var company = await repositoryManager.Company.GetCompanyAsync(id, changeTracker);
+        if (company is null)
+            throw new CompanyNotFoundException(id);
+        return company;
     }
 }
