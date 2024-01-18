@@ -5,6 +5,7 @@ using Domain.Models;
 using Entities.Exceptions;
 using Services.Contracts;
 using Shared.DTOs;
+using Shared.RequestFeatures;
 using System.ComponentModel.Design;
 
 namespace Services;
@@ -53,14 +54,16 @@ internal sealed class EmployeeService(IRepositoryManager repositoryManager, ILog
         return (employeeToPatch, employeeEntity);
     }
 
-    public async Task<IEnumerable<EmployeeDto>> GetEmployeesAsync(Guid companyId, bool changeTracker)
+    public async Task<(IEnumerable<EmployeeDto> employees, MetaData metaData)> GetEmployeesAsync(Guid companyId,EmployeeParameters employeeParameters, bool changeTracker)
     {
         await CheckIfCompanyExistsAsync(companyId, changeTracker);
 
-        var employeesFromDb =await repositoryManager.Employee.GetEmployeesAsync(companyId, changeTracker);
+        var employeesWithMetaData =await repositoryManager.Employee
+            .GetEmployeesAsync(companyId,employeeParameters, changeTracker);
 
-        var employeesDto = mapper.Map<IEnumerable<EmployeeDto>>(employeesFromDb);
-        return employeesDto;
+        var employeesDto = mapper.Map<IEnumerable<EmployeeDto>>(employeesWithMetaData);
+
+        return (employees:employeesDto,metaData:employeesWithMetaData.MetaData);
     }
 
     public async Task SaveChangesForPatchAsync(EmployeeForUpdateDto employeeToPatch, Employee employeeEntity)

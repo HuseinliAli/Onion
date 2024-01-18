@@ -2,6 +2,7 @@
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Repositories.Contexts;
+using Shared.RequestFeatures;
 
 namespace Repositories.Repos;
 
@@ -24,7 +25,16 @@ public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
         =>await FindCondition(x=>x.CompanyId.Equals(companyId ) && x.Id.Equals(id),changeTracker)
            .SingleOrDefaultAsync();
 
-    public  async Task<IEnumerable<Employee>> GetEmployeesAsync(Guid companyId, bool changeTracker)
-        =>await FindCondition(x=>x.CompanyId.Equals(companyId),changeTracker)
-        .OrderBy(x=>x.Name).ToListAsync();
+    public async Task<IEnumerable<Employee>> GetEmployeesAsync(Guid companyId, EmployeeParameters employeeParameters ,bool changeTracker)
+    {
+        var employees = await FindCondition(x => x.CompanyId.Equals(companyId), changeTracker)
+        .OrderBy(x => x.Name)
+        .Skip((employeeParameters.PageNumber-1)*employeeParameters.PageSize)
+        .Take(employeeParameters.PageSize)
+        .ToListAsync();
+        
+        var count = await FindCondition(x => x.CompanyId.Equals(companyId), changeTracker).CountAsync();
+
+        return new PagedList<Employee>(employees, count, employeeParameters.PageNumber, employeeParameters.PageSize);
+    }
 }
