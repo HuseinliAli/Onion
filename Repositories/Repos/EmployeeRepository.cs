@@ -31,9 +31,7 @@ public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
         var employees = await FindCondition(x => x.CompanyId.Equals(companyId), changeTracker)
         .FilterEmployees(employeeParameters.MinAge,employeeParameters.MaxAge)
         .Search(employeeParameters.SearchTerm)
-        .OrderBy(x => x.Name)
-        .Skip((employeeParameters.PageNumber-1)*employeeParameters.PageSize)
-        .Take(employeeParameters.PageSize)
+        .Sort(employeeParameters.OrderBy)
         .ToListAsync();
         
         var count = await FindCondition(x => x.CompanyId.Equals(companyId), changeTracker).CountAsync();
