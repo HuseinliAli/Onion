@@ -1,17 +1,20 @@
 ﻿using AutoMapper;
 using Contracts.Logging;
 using Contracts.Managers;
+using Contracts.Shapers;
 using Domain.Models;
 using Entities.Exceptions;
 using Services.Contracts;
 using Shared.DTOs;
 using Shared.RequestFeatures;
 using System.ComponentModel.Design;
+using System.Dynamic;
 
 namespace Services;
 
-internal sealed class EmployeeService(IRepositoryManager repositoryManager, ILoggerManager loggerManager, IMapper mapper) : IEmployeeService
+internal sealed class EmployeeService(IRepositoryManager repositoryManager, ILoggerManager loggerManager, IMapper mapper,IDataShaper<EmployeeDto> dataShaper) : IEmployeeService
 {
+
     public async Task<EmployeeDto> CreateEmployeeForCompanyAsync(Guid companyId, EmployeeForCreationDto employeeForCreationDto, bool changeTracker)
     {
         await CheckIfCompanyExistsAsync(companyId, changeTracker);
@@ -54,7 +57,7 @@ internal sealed class EmployeeService(IRepositoryManager repositoryManager, ILog
         return (employeeToPatch, employeeEntity);
     }
 
-    public async Task<(IEnumerable<EmployeeDto> employees, MetaData metaData)> GetEmployeesAsync(Guid companyId,EmployeeParameters employeeParameters, bool changeTracker)
+    public async Task<(IEnumerable<ExpandoObject> employees, MetaData metaData)> GetEmployeesAsync(Guid companyId,EmployeeParameters employeeParameters, bool changeTracker)
     {
         if (!employeeParameters.ValidAgeRange)
             throw new MaxAgeRangeBadRequestException();
@@ -66,7 +69,9 @@ internal sealed class EmployeeService(IRepositoryManager repositoryManager, ILog
 
         var employeesDto = mapper.Map<IEnumerable<EmployeeDto>>(employeesWithMetaData);
 
-        return (employees:employeesDto,metaData:employeesWithMetaData.MetaData);
+        var shapedData = dataShaper.ShapeData(employeesDto, employeeParameters.Fields);
+
+        return (employees:shapedData,metaData:employeesWithMetaData.MetaData);
     }
 
     public async Task SaveChangesForPatchAsync(EmployeeForUpdateDto employeeToPatch, Employee employeeEntity)

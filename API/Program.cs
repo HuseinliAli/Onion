@@ -1,6 +1,7 @@
 using API.Extensions;
 using CompanyEmloyees.Presentation.ActionFilters;
 using Contracts.Logging;
+using Contracts.Shapers;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -8,11 +9,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using NLog;
 using Repositories.Contexts;
+using Services;
+using Shared.DTOs;
 
 var builder = WebApplication.CreateBuilder(args);
 LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
 
 // Add services to the container.
+
 builder.Services.AddScoped<ValidationFilterAttribute>();
 builder.Services.ConfigureCors();
 builder.Services.ConfigureISSIntegration();
@@ -30,7 +34,7 @@ builder.Services.AddControllers(config =>
     config.InputFormatters.Insert(0,GetJsonPatchFormatter());   
 }).AddXmlDataContractSerializerFormatters()
     .AddApplicationPart(typeof(CompanyEmloyees.Presentation.AssemblyReference).Assembly);
-
+builder.Services.AddScoped<IDataShaper<EmployeeDto>, DataShaper<EmployeeDto>>();
 var app = builder.Build();
 var logger = app.Services.GetRequiredService<ILoggerManager>();
 app.ConfigureExceptionHandler(logger);

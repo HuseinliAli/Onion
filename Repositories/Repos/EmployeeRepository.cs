@@ -36,6 +36,6 @@ public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
         
         var count = await FindCondition(x => x.CompanyId.Equals(companyId), changeTracker).CountAsync();
 
-        return new PagedList<Employee>(employees, count, employeeParameters.PageNumber, employeeParameters.PageSize);
+        return PagedList<Employee>.ToPagedList(employees, employeeParameters.PageNumber, employeeParameters.PageSize);
     }
 }
