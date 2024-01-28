@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using Contracts.Hateoas;
 using Contracts.Logging;
 using Contracts.Managers;
 using Contracts.Shapers;
 using Domain.Models;
 using Entities.Exceptions;
+using Entities.LinkModels;
 using Services.Contracts;
 using Shared.DTOs;
 using Shared.RequestFeatures;
@@ -12,7 +14,7 @@ using System.Dynamic;
 
 namespace Services;
 
-internal sealed class EmployeeService(IRepositoryManager repositoryManager, ILoggerManager loggerManager, IMapper mapper,IDataShaper<EmployeeDto> dataShaper) : IEmployeeService
+internal sealed class EmployeeService(IRepositoryManager repositoryManager, ILoggerManager loggerManager, IMapper mapper,IDataShaper<EmployeeDto> dataShaper,IEmployeeLinks employeeLinks) : IEmployeeService
 {
 
     public async Task<EmployeeDto> CreateEmployeeForCompanyAsync(Guid companyId, EmployeeForCreationDto employeeForCreationDto, bool changeTracker)
@@ -57,21 +59,20 @@ internal sealed class EmployeeService(IRepositoryManager repositoryManager, ILog
         return (employeeToPatch, employeeEntity);
     }
 
-    public async Task<(IEnumerable<ExpandoObject> employees, MetaData metaData)> GetEmployeesAsync(Guid companyId,EmployeeParameters employeeParameters, bool changeTracker)
+    public async Task<(LinkResponse linkResponse, MetaData metaData)> GetEmployeesAsync(Guid companyId,LinkParameters linkParameters, bool changeTracker)
     {
-        if (!employeeParameters.ValidAgeRange)
+        if (!linkParameters.EmployeeParameters.ValidAgeRange)
             throw new MaxAgeRangeBadRequestException();
 
         await CheckIfCompanyExistsAsync(companyId, changeTracker);
 
         var employeesWithMetaData =await repositoryManager.Employee
-            .GetEmployeesAsync(companyId,employeeParameters, changeTracker);
+            .GetEmployeesAsync(companyId,linkParameters.EmployeeParameters, changeTracker);
 
         var employeesDto = mapper.Map<IEnumerable<EmployeeDto>>(employeesWithMetaData);
-
-        var shapedData = dataShaper.ShapeData(employeesDto, employeeParameters.Fields);
-
-        return (employees:shapedData,metaData:employeesWithMetaData.MetaData);
+        var links = employeeLinks.TryGenerateLinks(employeesDto, linkParameters.EmployeeParameters.Fields, companyId, linkParameters.Context);
+       
+        return (links,metaData:employeesWithMetaData.MetaData);
     }
 
     public async Task SaveChangesForPatchAsync(EmployeeForUpdateDto employeeToPatch, Employee employeeEntity)

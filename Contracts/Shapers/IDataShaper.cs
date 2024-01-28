@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Models;
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -9,8 +10,8 @@ namespace Contracts.Shapers
 {
     public interface IDataShaper<T>
     {
-        IEnumerable<ExpandoObject> ShapeData(IEnumerable<T> entites, string fieldsString);
+        IEnumerable<ShapedEntity> ShapeData(IEnumerable<T> entites, string fieldsString);
 
-        ExpandoObject ShapeData(T entity, string fieldsString); 
+        ShapedEntity ShapeData(T entity, string fieldsString); 
     }
 }

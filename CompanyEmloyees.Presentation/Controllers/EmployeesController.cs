@@ -16,20 +16,24 @@ namespace CompanyEmloyees.Presentation.Controllers
     [Route("api/companies/{companyId}/employees")]
     public class EmployeesController(IServiceManager service) : BaseApiController
     {
-
+        [HttpGet]
+        [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
         public async Task<IActionResult> GetEmployeesForCompany(Guid companyId, [FromQuery] EmployeeParameters employeeParameters)
         {
-            var pagedResult =await service.EmployeeService.GetEmployeesAsync(companyId, employeeParameters,false);
-            
-            Response.Headers.Add("X-Pagination",JsonSerializer.Serialize(pagedResult.metaData));
+            var linkParams = new LinkParameters(employeeParameters, HttpContext);
 
-            return Ok(pagedResult.employees);
+            var result = await service.EmployeeService.GetEmployeesAsync(companyId, linkParams, false);
+
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(result.metaData));
+
+            return result.linkResponse.HasLinks ? Ok(result.linkResponse.LinkedEntities) :
+                                                  Ok(result.linkResponse.ShapedEntities);
         }
 
         [HttpGet("{id:guid}", Name = "GetEmployeeForCompany")]
         public async Task<IActionResult> GetEmployeeForCompany(Guid companyId, Guid id)
         {
-            var employee =await service.EmployeeService.GetEmployeeAsync(companyId, id, changeTracker: false);
+            var employee = await service.EmployeeService.GetEmployeeAsync(companyId, id, changeTracker: false);
             return Ok(employee);
         }
 
@@ -37,23 +41,23 @@ namespace CompanyEmloyees.Presentation.Controllers
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateEmployeeForCompany(Guid companyId, [FromBody] EmployeeForCreationDto employee)
         {
-            var employeeToReturn =await service.EmployeeService.CreateEmployeeForCompanyAsync(companyId, employee, false);
+            var employeeToReturn = await service.EmployeeService.CreateEmployeeForCompanyAsync(companyId, employee, false);
 
             return CreatedAtRoute("GetEmployeeForCompany", new
-            {companyId,id =employeeToReturn.Id},employeeToReturn);
+            { companyId, id = employeeToReturn.Id }, employeeToReturn);
         }
 
         [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> DeleteEmployeeForCompany(Guid companyId,Guid id)
+        public async Task<IActionResult> DeleteEmployeeForCompany(Guid companyId, Guid id)
         {
-            await service.EmployeeService.DeleteEmployeeForCompanyAsync(companyId, id,false);
+            await service.EmployeeService.DeleteEmployeeForCompanyAsync(companyId, id, false);
             return NoContent();
         }
         [HttpPut("{id:guid}")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
-        public async Task<IActionResult> UpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody]EmployeeForUpdateDto employee)
+        public async Task<IActionResult> UpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody] EmployeeForUpdateDto employee)
         {
-            await service.EmployeeService.UpdateEmployeeForCompanyAsync(companyId, id, employee,false, true);
+            await service.EmployeeService.UpdateEmployeeForCompanyAsync(companyId, id, employee, false, true);
             return NoContent();
         }
 
@@ -63,9 +67,9 @@ namespace CompanyEmloyees.Presentation.Controllers
             if (patchDoc is null)
                 return BadRequest("patchDoc object sent from client is null");
 
-            var result =await service.EmployeeService.GetEmployeeForPatchAsync(companyId, id, false, true);
+            var result = await service.EmployeeService.GetEmployeeForPatchAsync(companyId, id, false, true);
 
-            patchDoc.ApplyTo(result.employeeToPatch,ModelState);
+            patchDoc.ApplyTo(result.employeeToPatch, ModelState);
 
             TryValidateModel(result.employeeToPatch);
 

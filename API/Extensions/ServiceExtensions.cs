@@ -2,6 +2,8 @@
 using Contracts.Managers;
 using LoggerService.NLog;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Repositories.Contexts;
 using Repositories.Managers;
@@ -38,5 +40,23 @@ public static class ServiceExtensions
     => services.AddSqlServer<RepositoryContext>((configuration
         .GetConnectionString("sqlConnection")));
 
+    public static void AddCustomMediaTypes(this IServiceCollection services)
+    {
+        services.Configure<MvcOptions>(config =>
+        {
+            var systemTextJsonOutputFormatter = config.OutputFormatters
+                .OfType<SystemTextJsonOutputFormatter>()?.FirstOrDefault();
+
+            if (systemTextJsonOutputFormatter !=null)
+                systemTextJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.codemaze.hateoas+json");
+
+
+            var xmlOutputFormatter = config.OutputFormatters
+                .OfType<XmlDataContractSerializerOutputFormatter>()?.FirstOrDefault();
+
+            if (xmlOutputFormatter != null)
+                xmlOutputFormatter.SupportedMediaTypes.Add("application/vnd.codemaze.hateoas+json");
+        });
+    }
 }
 

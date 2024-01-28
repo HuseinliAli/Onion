@@ -1,5 +1,7 @@
 using API.Extensions;
+using API.Utilities;
 using CompanyEmloyees.Presentation.ActionFilters;
+using Contracts.Hateoas;
 using Contracts.Logging;
 using Contracts.Shapers;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -18,6 +20,7 @@ LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nl
 // Add services to the container.
 
 builder.Services.AddScoped<ValidationFilterAttribute>();
+builder.Services.AddScoped<IEmployeeLinks, EmployeeLinks>();
 builder.Services.ConfigureCors();
 builder.Services.ConfigureISSIntegration();
 builder.Services.ConfigureLoggerService();
@@ -27,6 +30,7 @@ builder.Services.ConfigureSqlContext(builder.Configuration);
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.Configure<ApiBehaviorOptions>(opt =>
     { opt.SuppressModelStateInvalidFilter=true; });
+builder.Services.AddCustomMediaTypes();
 builder.Services.AddControllers(config =>
 {
     config.RespectBrowserAcceptHeader=true;

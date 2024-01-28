@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Domain.Models;
 
@@ -23,4 +24,3 @@ public class Employee
     public Guid CompanyId { get; set; }
     public Company? Company { get; set; }
 }
-
