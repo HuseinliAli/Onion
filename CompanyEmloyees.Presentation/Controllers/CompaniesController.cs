@@ -15,7 +15,7 @@ namespace CompanyEmloyees.Presentation.Controllers
     [Route("api/companies")]
     public class CompaniesController(IServiceManager serviceManager) : BaseApiController
     {
-        [HttpGet]
+        [HttpGet("GetCompanies")]
         public async Task<IActionResult> GetCompanies()
         {
            // throw new Exception("Exception");
@@ -30,7 +30,7 @@ namespace CompanyEmloyees.Presentation.Controllers
             return Ok(company);
         }
 
-        [HttpPost]
+        [HttpPost("CreateCompany")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreationDto company)
         {
