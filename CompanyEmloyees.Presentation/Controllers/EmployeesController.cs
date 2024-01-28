@@ -16,7 +16,14 @@ namespace CompanyEmloyees.Presentation.Controllers
     [Route("api/companies/{companyId}/employees")]
     public class EmployeesController(IServiceManager service) : BaseApiController
     {
+        [HttpOptions]
+        public IActionResult GetCompaniesOptions()
+        {
+            Response.Headers.Add("Allow", "GET, OPTIONS, POST");
+            return Ok();
+        }
         [HttpGet]
+        [HttpHead]
         [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
         public async Task<IActionResult> GetEmployeesForCompany(Guid companyId, [FromQuery] EmployeeParameters employeeParameters)
         {
