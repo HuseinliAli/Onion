@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace CompanyEmloyees.Presentation.Controllers
 {
+    [ApiVersion("2.0",Deprecated =true)]
     [Route("api/companies/{companyId}/employees")]
     public class EmployeesController(IServiceManager service) : BaseApiController
     {

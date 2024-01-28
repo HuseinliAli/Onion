@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 
 namespace CompanyEmloyees.Presentation.Controllers
 {
+    [ApiVersion("1.0")]
+    //[Route("api/{v:apiversion}/companies
     [Route("api/companies")]
     public class CompaniesController(IServiceManager serviceManager) : BaseApiController
     {

@@ -1,10 +1,13 @@
-﻿using Contracts.Logging;
+﻿using CompanyEmloyees.Presentation.Controllers;
+using Contracts.Logging;
 using Contracts.Managers;
 using LoggerService.NLog;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using Repositories.Contexts;
 using Repositories.Managers;
 using Services;
@@ -62,6 +65,22 @@ public static class ServiceExtensions
                 xmlOutputFormatter.SupportedMediaTypes.Add("application/vnd.codemaze.hateoas+json");
                 xmlOutputFormatter.SupportedMediaTypes.Add("application/vnd.codemaze.apiroot+json");
             }
+        });
+    }
+
+    public static void ConfigureVersioning(this IServiceCollection services)
+    {
+        services.AddApiVersioning(opt =>
+        {
+            opt.ReportApiVersions=true;
+            opt.AssumeDefaultVersionWhenUnspecified=true;
+            opt.DefaultApiVersion=new ApiVersion(1, 0);
+            opt.ApiVersionReader = new HeaderApiVersionReader("api-version");
+
+            opt.Conventions.Controller<CompaniesController>()
+                .HasApiVersion(new ApiVersion(1, 0));
+            opt.Conventions.Controller<EmployeesController>()
+                .HasApiVersion(new ApiVersion(2, 0));
         });
     }
 }
