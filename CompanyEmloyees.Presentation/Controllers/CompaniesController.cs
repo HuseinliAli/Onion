@@ -1,5 +1,6 @@
 ﻿using CompanyEmloyees.Presentation.ActionFilters;
 using CompanyEmloyees.Presentation.ModelBinders;
+using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Mvc;
 using Services.Contracts;
 using Shared.DTOs;
@@ -15,6 +16,7 @@ namespace CompanyEmloyees.Presentation.Controllers
     [ApiVersion("1.0")]
     //[Route("api/{v:apiversion}/companies
     [Route("api/companies")]
+    [ResponseCache(CacheProfileName ="120SecondsDuration")]
     public class CompaniesController(IServiceManager serviceManager) : BaseApiController
     {
         [HttpGet("GetCompanies")]
@@ -26,6 +28,8 @@ namespace CompanyEmloyees.Presentation.Controllers
         }
 
         [HttpGet("{id:guid}",Name ="CompanyById")]
+        [HttpCacheExpiration(CacheLocation=CacheLocation.Public,MaxAge =60)]
+        [HttpCacheValidation(MustRevalidate =false)]
         public async Task<IActionResult> GetCompany(Guid id)
         {
             var company =await serviceManager.CompanyService.GetCompanyAsync(id,changeTracker: false);

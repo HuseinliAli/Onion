@@ -1,7 +1,9 @@
-﻿using CompanyEmloyees.Presentation.Controllers;
+﻿using AspNetCoreRateLimit;
+using CompanyEmloyees.Presentation.Controllers;
 using Contracts.Logging;
 using Contracts.Managers;
 using LoggerService.NLog;
+using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -82,6 +84,30 @@ public static class ServiceExtensions
             opt.Conventions.Controller<EmployeesController>()
                 .HasApiVersion(new ApiVersion(2, 0));
         });
+    }
+
+    public static void ConfigureResponseCaching(this IServiceCollection services)
+        => services.AddResponseCaching();
+
+    public static void ConfigureHttpCacheHeaders(this IServiceCollection services)
+        => services.AddHttpCacheHeaders(expriationOpt =>
+        {
+            expriationOpt.MaxAge=65;
+            expriationOpt.CacheLocation=CacheLocation.Private;
+        },
+        validationOpt =>
+        {
+            validationOpt.MustRevalidate=true;
+        });
+
+    public static void ConfigureRateLimitingOptions(this IServiceCollection services)
+    {
+        var rateLimitRules = new List<RateLimitRule> { new RateLimitRule { Endpoint="*", Limit=3, Period="5m" } };
+        services.Configure<IpRateLimitOptions>(opt => { opt.GeneralRules=rateLimitRules; });
+        services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+        services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+        services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+        services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
     }
 }
 
