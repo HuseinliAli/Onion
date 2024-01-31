@@ -20,6 +20,9 @@ LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nl
 
 // Add services to the container.
 
+builder.Services.AddAuthentication();
+builder.Services.ConfigureIdentiy();
+builder.Services.ConfigureJWT(builder.Configuration);
 builder.Services.AddScoped<ValidationFilterAttribute>();
 builder.Services.AddScoped<IEmployeeLinks, EmployeeLinks>();
 builder.Services.ConfigureCors();
@@ -68,6 +71,7 @@ app.UseCors("CorsPolicy");
 app.UseResponseCaching();
 app.UseHttpCacheHeaders();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

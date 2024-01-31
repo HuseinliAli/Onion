@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Domain.Models;
+using Entities.Models;
 using Shared.DTOs;
 
 namespace API
@@ -15,6 +16,7 @@ namespace API
             CreateMap<EmployeeForCreationDto , Employee>();
             CreateMap<EmployeeForUpdateDto, Employee>().ReverseMap();
             CreateMap<CompanyForUpdateDto , Company>();
+            CreateMap<UserForRegistrationDto, User>();
         }
     }
 }

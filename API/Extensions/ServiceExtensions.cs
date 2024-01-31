@@ -2,18 +2,23 @@
 using CompanyEmloyees.Presentation.Controllers;
 using Contracts.Logging;
 using Contracts.Managers;
+using Entities.Models;
 using LoggerService.NLog;
 using Marvin.Cache.Headers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using Microsoft.IdentityModel.Tokens;
 using Repositories.Contexts;
 using Repositories.Managers;
 using Services;
 using Services.Contracts;
+using System.Text;
 
 namespace API.Extensions;
 public static class ServiceExtensions
@@ -102,12 +107,54 @@ public static class ServiceExtensions
 
     public static void ConfigureRateLimitingOptions(this IServiceCollection services)
     {
-        var rateLimitRules = new List<RateLimitRule> { new RateLimitRule { Endpoint="*", Limit=3, Period="5m" } };
+        var rateLimitRules = new List<RateLimitRule> { new RateLimitRule { Endpoint="*", Limit=100, Period="5m" } };
         services.Configure<IpRateLimitOptions>(opt => { opt.GeneralRules=rateLimitRules; });
         services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
         services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
         services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
         services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
+    }
+
+    public static void ConfigureIdentiy(this IServiceCollection services)
+    {
+        var builder = services.AddIdentity<User, IdentityRole>(opt =>
+        {
+            opt.Password.RequireDigit=false;
+            opt.Password.RequireLowercase=false;
+            opt.Password.RequireUppercase=false;
+            opt.Password.RequireNonAlphanumeric=false;
+            opt.Password.RequiredLength = 3;
+            opt.User.RequireUniqueEmail=true;
+
+        })
+            .AddEntityFrameworkStores<RepositoryContext>()
+            .AddDefaultTokenProviders();
+    }
+
+    public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
+    {
+        var jwtSettings = configuration.GetSection("JwtSettings");
+
+        services.AddAuthentication(opt =>
+        {
+            opt.DefaultAuthenticateScheme=JwtBearerDefaults.AuthenticationScheme;
+            opt.DefaultChallengeScheme=JwtBearerDefaults.AuthenticationScheme;
+        })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters=new TokenValidationParameters
+                {
+                    ValidateIssuer=true,
+                    ValidateAudience=true,
+                    ValidateLifetime=true,
+                    ValidateIssuerSigningKey=true,
+
+                    ValidIssuer=jwtSettings["validIssuer"],
+                    ValidAudience=jwtSettings["validAudience"],
+                    IssuerSigningKey=new SymmetricSecurityKey
+                    (Encoding.UTF8.GetBytes(jwtSettings["secret"]))
+                };
+            });
     }
 }
 

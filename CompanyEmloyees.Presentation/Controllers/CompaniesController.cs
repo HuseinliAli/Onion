@@ -1,6 +1,7 @@
 ﻿using CompanyEmloyees.Presentation.ActionFilters;
 using CompanyEmloyees.Presentation.ModelBinders;
 using Marvin.Cache.Headers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Contracts;
 using Shared.DTOs;
@@ -20,6 +21,7 @@ namespace CompanyEmloyees.Presentation.Controllers
     public class CompaniesController(IServiceManager serviceManager) : BaseApiController
     {
         [HttpGet("GetCompanies")]
+        [Authorize(Roles ="Adminstrator")]
         public async Task<IActionResult> GetCompanies()
         {
            // throw new Exception("Exception");
