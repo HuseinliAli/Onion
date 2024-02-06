@@ -15,6 +15,7 @@ namespace CompanyEmloyees.Presentation.Controllers
 {
     [ApiVersion("2.0")]
     [Route("api/companies/{companyId}/employees")]
+    [ApiExplorerSettings(GroupName ="v2")]
     public class EmployeesController(IServiceManager service) : BaseApiController
     {
         [HttpOptions]

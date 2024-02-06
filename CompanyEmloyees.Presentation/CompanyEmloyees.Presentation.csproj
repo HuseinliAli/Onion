@@ -5,7 +5,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DocumentationFile>CompanyEmployees.Presentation.xml</DocumentationFile>
+		<OutputPath></OutputPath>
+		<NoWarn>1701;1702;1591</NoWarn>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<NoWarn>1701;1702;1591</NoWarn>
+	</PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Marvin.Cache.Headers" Version="7.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="8.0.1" />
@@ -17,5 +24,5 @@
   <ItemGroup>
     <ProjectReference Include="..\Services.Contracts\Services.Contracts.csproj" />
   </ItemGroup>
-
+	
 </Project>

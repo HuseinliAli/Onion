@@ -19,6 +19,7 @@ using Repositories.Managers;
 using Services;
 using Services.Contracts;
 using System.Text;
+using Microsoft.OpenApi.Models;
 
 namespace API.Extensions;
 public static class ServiceExtensions
@@ -155,6 +156,42 @@ public static class ServiceExtensions
                     (Encoding.UTF8.GetBytes(jwtSettings["secret"]))
                 };
             });
+    }
+
+    public static void ConfigureSwagger(this IServiceCollection services)
+    {
+        services.AddSwaggerGen(s =>
+        {
+            s.SwaggerDoc("v1", new OpenApiInfo { Title="API", Version="v1" });
+            s.SwaggerDoc("v2", new OpenApiInfo { Title="API", Version="v2" });
+
+            var xmlPath = "C:\\Users\\Ali\\Desktop\\CodeMaze\\CustomerEmployees\\CompanyEmloyees.Presentation\\CompanyEmployees.Presentation.xml";
+            s.IncludeXmlComments(xmlPath);
+
+            s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Description = "Place to add JWT with Bearer",
+                Name = "Authorization",
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
+            });
+            s.AddSecurityRequirement(new OpenApiSecurityRequirement()
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type=ReferenceType.SecurityScheme,
+                            Id="Bearer"
+                        },
+                        Name="Bearer"
+                    },
+                    new List<string>()
+                }
+            }); 
+        });
     }
 }
 

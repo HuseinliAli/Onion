@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Contracts.Logging;
+using Entities.Exceptions;
 using Entities.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -119,12 +120,14 @@ namespace Services
                 ValidateLifetime = true,
                 ValidIssuer = jwtSettings["validIssuer"],
                 ValidAudience = jwtSettings["validAudience"]
-            };
+            };
+
             var tokenHandler = new JwtSecurityTokenHandler();
             SecurityToken securityToken;
             var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out
             securityToken);
-            var jwtSecurityToken = securityToken as JwtSecurityToken;            if (jwtSecurityToken == null ||
+            var jwtSecurityToken = securityToken as JwtSecurityToken;
+            if (jwtSecurityToken == null ||
                     !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256,
                      StringComparison.InvariantCultureIgnoreCase))
             {
