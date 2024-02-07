@@ -3,6 +3,7 @@ using Contracts.Logging;
 using Contracts.Managers;
 using Domain.Models;
 using Entities.Exceptions;
+using Entities.Responses;
 using Services.Contracts;
 using Shared.DTOs;
 using System;
@@ -58,18 +59,18 @@ internal sealed class CompanyService(IRepositoryManager repositoryManager, ILogg
         return companiesToReturn;
     }
 
-    public async Task<IEnumerable<CompanyDto>> GetAllCompaniesAsync(bool changeTracker)
+    public ApiBaseResponse GetAllCompaniesAsync(bool changeTracker)
     {
-        var companies =await repositoryManager.Company.GetAllCompaniesAsync(changeTracker);
+        var companies = repositoryManager.Company.GetAllCompaniesAsync(changeTracker);
         var companiesDto = mapper.Map<IEnumerable<CompanyDto>>(companies);
-        return companiesDto;
+        return new ApiOkResponse<IEnumerable<CompanyDto>(companiesDto);
     }
 
-    public async Task<CompanyDto> GetCompanyAsync(Guid companyId, bool changeTracker)
+    public ApiBaseResponse GetCompanyAsync(Guid companyId, bool changeTracker)
     {
-        var company =await GetCompanyAndCheckIfItExistsAsync(companyId, changeTracker);
+        var company = GetCompanyAndCheckIfItExistsAsync(companyId, changeTracker);
         var companyDto = mapper.Map<CompanyDto>(company);
-        return companyDto;
+        return new ApiOkResponse<CompanyDto>(companyDto);
     }
 
     public async Task UpdateCompanyAsync(Guid companyId, CompanyForUpdateDto companyForUpdate, bool changeTracker)

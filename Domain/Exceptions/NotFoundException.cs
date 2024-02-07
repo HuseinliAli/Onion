@@ -13,25 +13,3 @@ public abstract class NotFoundException : Exception
 
     }
 }
-public sealed class CompanyCollectionBadRequest : BadRequestException
-{
-    public CompanyCollectionBadRequest():base("Company collection sent from a client is null")
-    {
-        
-    }
-}
-
-public sealed class MaxAgeRangeBadRequestException : BadRequestException
-{
-    public MaxAgeRangeBadRequestException() : base("Max age cant be less than min age")
-    {
-    }
-}
-
-public sealed class RefreshTokenBadRequest : BadRequestException
-{
-    public RefreshTokenBadRequest() :base("Invalid client request. The tokenDto has some invalid values")
-    {
-        
-    }
-}

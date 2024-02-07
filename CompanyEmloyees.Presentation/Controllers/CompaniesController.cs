@@ -1,5 +1,7 @@
 ﻿using CompanyEmloyees.Presentation.ActionFilters;
+using CompanyEmloyees.Presentation.Extensions;
 using CompanyEmloyees.Presentation.ModelBinders;
+using Entities.Responses;
 using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,10 +29,11 @@ namespace CompanyEmloyees.Presentation.Controllers
         /// <returns>The companies list</returns>
         [HttpGet("GetCompanies")]
         [Authorize(Roles ="Adminstrator")]
-        public async Task<IActionResult> GetCompanies()
+        public IActionResult GetCompanies()
         {
-           // throw new Exception("Exception");
-            var companies =await serviceManager.CompanyService.GetAllCompaniesAsync(false);
+            // throw new Exception("Exception");
+            var baseResult = serviceManager.CompanyService.GetAllCompaniesAsync(false);
+            var companies = baseResult.GetResult<IEnumerable<CompanyDto>>();
             return Ok(companies);
         }
 
@@ -39,7 +42,11 @@ namespace CompanyEmloyees.Presentation.Controllers
         [HttpCacheValidation(MustRevalidate =false)]
         public async Task<IActionResult> GetCompany(Guid id)
         {
-            var company =await serviceManager.CompanyService.GetCompanyAsync(id,changeTracker: false);
+            var baseResult = serviceManager.CompanyService.GetCompanyAsync(id, false);
+            if (!baseResult.Success)
+                return ProcessError(baseResult);
+
+            var company = baseResult.GetResult<CompanyDto>();
             return Ok(company);
         }
 
