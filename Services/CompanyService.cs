@@ -63,7 +63,7 @@ internal sealed class CompanyService(IRepositoryManager repositoryManager, ILogg
     {
         var companies = repositoryManager.Company.GetAllCompaniesAsync(changeTracker);
         var companiesDto = mapper.Map<IEnumerable<CompanyDto>>(companies);
-        return new ApiOkResponse<IEnumerable<CompanyDto>(companiesDto);
+        return new ApiOkResponse<IEnumerable<CompanyDto>>(companiesDto);
     }
 
     public ApiBaseResponse GetCompanyAsync(Guid companyId, bool changeTracker)

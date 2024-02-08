@@ -5,10 +5,12 @@ using CompanyEmloyees.Presentation.ActionFilters;
 using Contracts.Hateoas;
 using Contracts.Logging;
 using Contracts.Shapers;
+using MediatR;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NLog;
 using Repositories.Contexts;
@@ -19,6 +21,8 @@ var builder = WebApplication.CreateBuilder(args);
 LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
 
 // Add services to the container.
+builder.Services.AddMediatR(typeof(Application.AssemblyReference).Assembly);
+builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.ConfigureSwagger();
 builder.Services.AddAuthentication();
 builder.Services.ConfigureIdentiy();
