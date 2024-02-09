@@ -1,6 +1,8 @@
 ﻿using Application.Commands;
+using Application.Notifications;
 using Application.Queries;
 using AutoMapper;
+using Contracts.Logging;
 using Contracts.Managers;
 using Domain.Models;
 using Entities.Exceptions;
@@ -60,17 +62,23 @@ internal sealed class UpdateCompanyHandler(IRepositoryManager repository, IMappe
         return Unit.Value;
     }
 }
-internal sealed class DeleteCompanyHandler(IRepositoryManager repository) : IRequestHandler<DeleteCompanyCommand, Unit>
+internal sealed class DeleteCompanyHandler(IRepositoryManager repository) :INotificationHandler<CompanyDeleteNotification>
 {
-    public async Task<Unit> Handle(DeleteCompanyCommand request, CancellationToken cancellationToken)
+    public async Task Handle(CompanyDeleteNotification notification, CancellationToken cancellationToken)
     {
-        var companyEntity = await repository.Company.GetCompanyAsync(request.Id, request.ChangeTracker);
+        var companyEntity = await repository.Company.GetCompanyAsync(notification.Id, notification.ChangeTracker);
         if (companyEntity is null)
-            throw new CompanyNotFoundException(request.Id);
+            throw new CompanyNotFoundException(notification.Id);
 
         repository.Company.DeleteCompany(companyEntity);
-        await repository.SaveAsync();
-
-        return Unit.Value;
+        await repository.SaveAsync(); 
+    }
+}
+internal sealed class EmailHandler(ILoggerManager logger) : INotificationHandler<CompanyDeleteNotification>
+{
+    public async Task Handle(CompanyDeleteNotification notification, CancellationToken cancellationToken)
+    {
+        logger.LogWarning($"Delete action for company with id: {notification.Id}");
+        await Task.CompletedTask;
     }
 }

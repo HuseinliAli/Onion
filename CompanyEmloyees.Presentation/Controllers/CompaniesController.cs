@@ -1,31 +1,21 @@
 ﻿using Application.Commands;
+using Application.Notifications;
 using Application.Queries;
 using CompanyEmloyees.Presentation.ActionFilters;
-using CompanyEmloyees.Presentation.Extensions;
-using CompanyEmloyees.Presentation.ModelBinders;
-using Entities.Responses;
 using Marvin.Cache.Headers;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualBasic;
-using Services.Contracts;
 using Shared.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace CompanyEmloyees.Presentation.Controllers
 {
     [ApiVersion("1.0")]
     //[Route("api/{v:apiversion}/companies
     [Route("api/companies")]
-    [ResponseCache(CacheProfileName ="120SecondsDuration")]
+    [ResponseCache(CacheProfileName = "120SecondsDuration")]
     [ApiExplorerSettings(GroupName = "v1")]
-    public class CompaniesController(ISender sender) : BaseApiController
+    public class CompaniesController(ISender sender, IPublisher publisher) : BaseApiController
     {
         /// <summary>
         /// Gets the list of all companies
@@ -40,9 +30,9 @@ namespace CompanyEmloyees.Presentation.Controllers
             return Ok(companies);
         }
 
-        [HttpGet("{id:guid}",Name ="CompanyById")]
-        [HttpCacheExpiration(CacheLocation=CacheLocation.Public,MaxAge =60)]
-        [HttpCacheValidation(MustRevalidate =false)]
+        [HttpGet("{id:guid}", Name = "CompanyById")]
+        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
+        [HttpCacheValidation(MustRevalidate = false)]
         public async Task<IActionResult> GetCompany(Guid id)
         {
             var company = await sender.Send(new GetCompanyQuery(id, false));
@@ -86,20 +76,20 @@ namespace CompanyEmloyees.Presentation.Controllers
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> DeleteCompany(Guid id)
         {
-            await sender.Send(new DeleteCompanyCommand(id, false));
+            await publisher.Publish(new CompanyDeleteNotification(id, false));
             return NoContent();
         }
 
         [HttpPut("{id:guid}")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
-        public async Task<IActionResult> UpdateCompany(Guid id, [FromBody]CompanyForUpdateDto company)
+        public async Task<IActionResult> UpdateCompany(Guid id, [FromBody] CompanyForUpdateDto company)
         {
             if (company is null)
                 return BadRequest("CompanyForUpdateDto object is null");
 
             await sender.Send(new UpdateCompanyCommand(id, company, true));
 
-            return NoContent(); 
+            return NoContent();
         }
     }
 }
