@@ -9,5 +9,4 @@ using System.Threading.Tasks;
 namespace Application.Queries
 {
     public sealed record GetCompaniesQuery(bool ChangeTracker):IRequest<IEnumerable<CompanyDto>>;
-    public sealed record GetCompanyQuery(Guid Id, bool ChangeTracker):IRequest<CompanyDto>;
  }
